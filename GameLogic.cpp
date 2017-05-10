@@ -2,9 +2,7 @@
 
 GameLogic::GameLogic()
 {
-	this->myEvents = new ArrayList<Event>(20);
-	this->myButtonListener = new ButtonListener(this);
-	this->myMovementHandler = new MovementHandler(this);
+	
 }
 
 void GameLogic::addEvent(Event myEvent)
@@ -38,6 +36,6 @@ void GameLogic::tick()
 		{
 			//skicka event till MapHandler
 		}
-		this->myEvents->remove(currentEvent);  //Tar bort event från listan
+		this->myEvents->remove(currentEvent);  //Tar bort event frÃ¥n listan
 	}
 }
