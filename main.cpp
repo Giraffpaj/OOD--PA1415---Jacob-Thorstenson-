@@ -1,25 +1,28 @@
-#include <SFML/Graphics.hpp>
-#include <ctime>
+#include <iostream>
 #include "MapGenerator.h"
-#include "GameLogic.h"
+#include <ctime>
+using namespace std;
+
 
 int main()
 {
-	GameLogic myGameLogic;
-	//data skapats
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	srand(static_cast<unsigned>(time(0)));
-	//sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Application");
-	
-	//looop
-	
-	
-	
-	
-	myGameLogic->tick();
-	
-	MapGenerator mG(32,25);
+	for (int a = 0; a < 28; a++)
+	{
+		
+		for (int b = 0; b < 50; b++)
+		{
+			cout << "#0";
+		}
+		cout << endl;
+	}
+
+	cout << endl << endl << endl;
+	cout << endl << endl << endl;
+	MapGenerator mG(50, 28);
 	mG.createMapDesign();
-	mG.draw();
-	
-	//slut ppå loop
+	mG.drawMap();
+
+	return 0;
 }

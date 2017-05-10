@@ -1,115 +1,365 @@
 #include "MapGenerator.h"
 
-MapGenerator::MapGenerator(int length, int height)
+void MapGenerator::expand()
 {
-	this->length = length;
-	this->height = height;
-	this->tempMap = new int*[length];
-	for (int a = 0; a < this->length; a++)
+	this->cap += this->increment;
+	sf::Vector2i*temp = new sf::Vector2i[this->cap];
+	for (int a = 0; a < this->nrOfPoints; a++)
 	{
-		this->tempMap[a] = new int[this->height];
+		temp[a] = this->crossPoints[a];
 	}
-	this->start.x = this->length / 2;
-	this->start.y = this->height / 2;
+	delete[]this->crossPoints;
+	this->crossPoints = temp;
 }
 
-sf::Vector2i* MapGenerator::createPath(int up, int right, int down, int left)
+void MapGenerator::deepCopy(const MapGenerator & other)
 {
-	int nrOfTiles = 0;
-	int value = 0;
-	int cap = rand() % 3 + 5;
-	this->currentPathLength = cap;
-	sf::Vector2i*path = new sf::Vector2i[cap];
-	path[0] = this->start;
-	int move = 0;
-	int direction = 0;
-	while (nrOfTiles <= cap)
+	this->cap = other.cap;
+	this->increment = other.increment;
+	this->nrOfPoints = other.nrOfPoints;
+	this->xSize = other.xSize;
+	this->ySize = other.ySize;
+	this->crossPoints = new sf::Vector2i[this->cap];
+	this->map = new int*[this->ySize];
+	for (int a = 0; a < this->ySize; a++)
 	{
-		move = rand() % 10 + 1;
-		if (direction == 0 && up >= move)
-		{//makeMove
-			value = -1;
-			if (this->height > path[nrOfTiles].y + value && path[nrOfTiles].y+value > 0)
-			{
-				path[nrOfTiles + 1] = sf::Vector2i(path[nrOfTiles].x, path[nrOfTiles].y + value);
-				nrOfTiles++;
-			}
-		}
-		else if (direction == 1 && right >= move)
-		{//makeMove
-			value = 1;
-			if (this->length > path[nrOfTiles].x + value && path[nrOfTiles].x+value > 0)
-			{
-				path[nrOfTiles + 1] = sf::Vector2i(path[nrOfTiles].x+value, path[nrOfTiles].y);
-				nrOfTiles++;
-			}
-		}
-		else if (direction == 2 && down >= move)
-		{//makeMove
-			value = 1;
-			if (this->height > path[nrOfTiles].y + value && path[nrOfTiles].y + value > 0)
-			{
-				path[nrOfTiles + 1] = sf::Vector2i(path[nrOfTiles].x, path[nrOfTiles].y + value);
-				nrOfTiles++;
-			}
-		}
-		else if (direction == 3 && left >= move)
-		{//makeMove
-			value = -1;
-			if (this->length > path[nrOfTiles].x + value && path[nrOfTiles].x + value > 0)
-			{
-				path[nrOfTiles + 1] = sf::Vector2i(path[nrOfTiles].x + value, path[nrOfTiles].y);
-				nrOfTiles++;
-			}
-		}
-		direction++;
-		if (direction > 3)
+		this->map[a] = new int[this->xSize];
+		for (int b = 0; b < this->xSize; b++)
 		{
-			direction = 0;
+			this->map[a][b] = other.map[a][b];
 		}
 	}
-	return path;
+	for (int a = 0; a < this->nrOfPoints; a++)
+	{
+		this->crossPoints[a] = other.crossPoints[a];
+	}
 }
 
-void MapGenerator::createMapDesign(int recursion)
+void MapGenerator::clearAll()
 {
-	for (int b = 0; b < 10; b++)
+	for (int a = 0; a < this->ySize; a++)
 	{
-		int up = rand() % 10;
-		int right = rand() % 10;
-		int down = rand() % 10;
-		int left = rand() % 10;
-		sf::Vector2i*path = this->createPath(up, right, down, left);
-		for (int a = 0; a < this->currentPathLength; a++)
-		{
-			this->tempMap[path[a].x][path[a].y] = 1;
-		}
-		int randNr = rand()%this->currentPathLength;
-		start = path[randNr];
-		//delete[] path;
+		delete[] this->map[a];
 	}
-	if (recursion != 5)
+	delete[]this->map;
+	delete[]this->crossPoints;
+}
+
+MapGenerator::MapGenerator(int xSize, int ySize)
+{
+	this->nrOfMapTiles = 0;
+	this->corridorSize = 0;
+	this->currentCrosspoint = 0;
+	this->cap = this->increment = 20;
+	this->nrOfPoints = 0;
+	this->xSize = xSize;
+	this->ySize = ySize;
+	this->map = new int*[this->ySize];
+	for (int a = 0; a < this->ySize; a++)
 	{
-		this->start.x = this->length / 2;
-		this->start.y = this->height / 2;
-		this->createMapDesign(recursion + 1);
+		this->map[a] = new int[this->xSize];
 	}
+	this->crossPoints = new sf::Vector2i[this->cap];
 
 }
 
-void MapGenerator::draw()
+MapGenerator::~MapGenerator()
 {
-	for (int a = 0; a < this->height; a++)
+	this->clearAll();
+}
+
+MapGenerator::MapGenerator(const MapGenerator & other)
+{
+	this->deepCopy(other);
+}
+
+MapGenerator & MapGenerator::operator=(const MapGenerator & other)
+{
+	if (this != &other)
 	{
-		for (int b = 0; b < this->length; b++)
+		this->clearAll();
+		this->deepCopy(other);
+	}
+	return *this;
+}
+
+void MapGenerator::createMapDesign()
+{
+	this->nrOfMapTiles = 0;
+	sf::Vector2i*corridor;
+	bool successfulApply = true;
+	int x = 25;
+	int y = 14;
+	this->crossPoints[0] = sf::Vector2i(x, y);
+	int dirPriority[4] = { 0,1,2,3 };
+	while (this->nrOfMapTiles < 300)
+	{
+		int randIndex = rand() % 4;
+		dirPriority[0] = dirPriority[randIndex];
+		dirPriority[3] = this->getTail(dirPriority[0]);
+		randIndex = rand() % 2;
+		if (dirPriority[0] == 0 || dirPriority[0] == 2)
 		{
-			if (this->tempMap[b][a] == 1)
+			if (randIndex == 0) {
+				dirPriority[1] = 1;
+				dirPriority[2] = 3;
+			}
+			else {
+				dirPriority[1] = 3;
+				dirPriority[2] = 1;
+			}
+		}
+		else
+		{
+			if (randIndex == 0) {
+				dirPriority[1] = 0;
+				dirPriority[2] = 2;
+			}
+			else {
+				dirPriority[1] = 2;
+				dirPriority[2] = 0;
+			}
+		}
+		successfulApply = true;
+		std::cout << this->nrOfMapTiles << std::endl;
+		int middle = rand() % 5;
+		if (middle == 1)
+		{
+			corridor = this->createCorridor(dirPriority, crossPoints[0]);
+		}
+		else
+		{
+			corridor = this->createCorridor(dirPriority, crossPoints[rand() % (this->nrOfPoints + 1)]);
+		}
+		
+		for (int a = 0; a < this->corridorSize; a++)
+		{
+			if (corridor[a].y > 0 && corridor[a].y < this->ySize - 1 && corridor[a].x > 0 && corridor[a].x < this->xSize - 1)
 			{
-				std::cout << "X";
+				this->nrOfMapTiles++;
+				this->map[corridor[a].y][corridor[a].x] = 1;
 			}
 			else
 			{
-				std::cout << " ";
+				successfulApply = false;
+				a = this->corridorSize;
+			}
+		}
+		if (successfulApply)
+		{
+			this->crossPoints[this->nrOfPoints++] = corridor[this->corridorSize-1];
+		}
+		if (corridor != nullptr)
+		{
+			delete[]corridor;
+		}
+	}
+}
+
+sf::Vector2i * MapGenerator::createCorridor(int dirPriority[], sf::Vector2i start)
+{
+	int randCap = rand() % 4 + 10;
+	sf::Vector2i*corridor = new sf::Vector2i[randCap*3];
+	corridor[0] = start;
+	int nrOfSteps = 1;
+	for(int a = 0; a < randCap; a++)
+	{
+		int randNum = rand() % 170;
+		if (randNum > 90)
+		{
+			start = makeStep(dirPriority[0], start);
+			corridor[nrOfSteps++] = start;
+			//expand possibility
+			randNum = rand() % 170;
+			if (randNum > 150)
+			{
+				
+				start = makeStep(this->getRight(dirPriority[0]), start);
+				corridor[nrOfSteps++] = start;
+			}
+			if (randNum > 110)
+			{
+				randNum = rand() % 2;
+				if (randNum == 1)
+				{
+					start = makeStep(this->getLeft(dirPriority[0]), start);
+					corridor[nrOfSteps++] = start;
+				}
+				else
+				{
+					start = makeStep(this->getLeft(dirPriority[0]), start);
+					corridor[nrOfSteps++] = start;
+				}
+				
+			}
+		}
+		else if (randNum > 30)
+		{
+			start = makeStep(dirPriority[1], start);
+			corridor[nrOfSteps++] = start;
+			//expand possibility
+			randNum = rand() % 170;
+			if (randNum > 150)
+			{
+
+				start = makeStep(this->getRight(dirPriority[1]), start);
+				corridor[nrOfSteps++] = start;
+			}
+			if (randNum > 110)
+			{
+				randNum = rand() % 2;
+				if (randNum == 1)
+				{
+					start = makeStep(this->getLeft(dirPriority[1]), start);
+					corridor[nrOfSteps++] = start;
+				}
+				else
+				{
+					start = makeStep(this->getLeft(dirPriority[1]), start);
+					corridor[nrOfSteps++] = start;
+				}
+
+			}
+		}
+		else if (randNum > 10)
+		{
+			start = makeStep(dirPriority[2], start);
+			corridor[nrOfSteps++] = start;
+			//expand possibility
+			randNum = rand() % 170;
+			if (randNum > 150)
+			{
+
+				start = makeStep(this->getRight(dirPriority[2]), start);
+				corridor[nrOfSteps++] = start;
+			}
+			if (randNum > 110)
+			{
+				randNum = rand() % 2;
+				if (randNum == 1)
+				{
+					start = makeStep(this->getLeft(dirPriority[2]), start);
+					corridor[nrOfSteps++] = start;
+				}
+				else
+				{
+					start = makeStep(this->getLeft(dirPriority[2]), start);
+					corridor[nrOfSteps++] = start;
+				}
+
+			}
+		}
+		else
+		{
+			start = makeStep(dirPriority[3], start);
+			corridor[nrOfSteps++] = start;
+			//expand possibility
+			randNum = rand() % 170;
+			if (randNum > 150)
+			{
+
+				start = makeStep(this->getRight(dirPriority[3]), start);
+				corridor[nrOfSteps++] = start;
+			}
+			if (randNum > 110)
+			{
+				randNum = rand() % 2;
+				if (randNum == 1)
+				{
+					start = makeStep(this->getLeft(dirPriority[3]), start);
+					corridor[nrOfSteps++] = start;
+				}
+				else
+				{
+					start = makeStep(this->getLeft(dirPriority[3]), start);
+					corridor[nrOfSteps++] = start;
+				}
+
+			}
+		}
+	}
+	this->corridorSize = nrOfSteps;
+	return corridor;
+}
+
+sf::Vector2i MapGenerator::makeStep(int dir, sf::Vector2i lastStart)
+{
+
+	if (dir == 0)
+	{
+		lastStart.y--;
+	}
+	else if (dir == 1)
+	{
+		lastStart.x++;
+	}
+	else if (dir == 2)
+	{
+		lastStart.y++;
+	}
+	else
+	{
+		lastStart.x--;
+	}
+
+	return lastStart;
+}
+
+int MapGenerator::getLeft(int dir)
+{
+	int left;
+	if (dir == 0)
+		left = 3;
+	else if (dir == 1)
+		left = 0;
+	else if (dir == 2)
+		left = 1;
+	else
+		left = 2;
+	return left;
+}
+
+int MapGenerator::getRight(int dir)
+{
+	int right;
+	if (dir == 0)
+		right = 1;
+	else if (dir == 1)
+		right = 2;
+	else if (dir == 2)
+		right = 3;
+	else
+		right = 0;
+	return right;
+}
+
+int MapGenerator::getTail(int dir)
+{
+	int tail;
+	if (dir == 0)
+		tail = 2;
+	else if (dir == 1)
+		tail = 3;
+	else if (dir == 2)
+		tail = 0;
+	else
+		tail = 1;
+	return tail;
+}
+
+void MapGenerator::drawMap()
+{
+	for (int a = 0; a < this->ySize; a++)
+	{
+		for (int b = 0; b < this->xSize; b++)
+		{
+			if (map[a][b] == 1)
+			{
+				std::cout << "[]";
+			}
+			else
+			{
+				std::cout << "##";
 			}
 		}
 		std::cout << std::endl;
