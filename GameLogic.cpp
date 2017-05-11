@@ -1,4 +1,6 @@
 #include "GameLogic.h"
+#include "ButtonListener.h"
+#include "MovementHandler.h"
 
 GameLogic::GameLogic()
 {
