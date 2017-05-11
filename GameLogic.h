@@ -5,8 +5,10 @@
 #include <SFML\System.hpp>
 #include "Event.h"
 #include "ArrayList.h"
-#include "ButtonListener.h"  //kommentera ut denna och allt blir r‰tt
-#include "MovementHandler.h"
+//#include "ButtonListener.h"  //kommentera ut denna och allt blir r√§tt
+class ButtonListener;
+//#include "MovementHandler.h"
+class MovementHandler;
 
 using namespace std;
 
