@@ -75,6 +75,41 @@ Event & Event::operator=(const Event & other)
 	return *this;
 }
 
+bool Event::operator==(const Event & other)
+{
+	bool valid = true;
+	if (this->action != nullptr && other.action != nullptr)
+	{
+		if (!(*this->action == *other.action))
+		{
+			valid = false;
+		}
+	}
+	if (this->dataNum != nullptr && other.dataNum != nullptr)
+	{
+		if (!(*this->dataNum == *other.dataNum))
+		{
+			valid = false;
+		}
+	}
+	if (this->dataTxt != nullptr && other.dataTxt != nullptr)
+	{
+		if (!(*this->dataTxt == *other.dataTxt))
+		{
+			valid = false;
+		}
+	}
+	if (this->dataNum != nullptr && other.dataNum != nullptr)
+	{
+		if (!(*this->handler == *other.handler))
+		{
+			valid = false;
+		}
+	}
+	
+	return valid;
+}
+
 std::string Event::getToString() const
 {
 	std::string ha = "None";

@@ -1,26 +1,16 @@
-#ifndef PLAYER_H
-#define PLAYER_H
-#include "Object.h"
+#pragma once
+#include "DynamicObject.h"
 
-class Player : public Object
+class Player : public DynamicObject
 {
-	private:
-		int health;
-		int damage;
-		int movement;
-		int mapXPos;
-		int mapYPos;
-		int playerID;
-		//Backpack myBackpack;
-	public:
-		Player(string textureName, int id, string name, int mapXPos, int mapYPos, int playerID);
-		~Player();
-		void setPosition(int playerPosX, int playerPos);
-		void die();
-		int getHealth()const;
-		int getXPos()const;
-		int getYPos()const;
-		
-
+private:
+	//inget måste för MVP
+	//hp
+	//equipment
+	//stats
+	//class
+	//och dylikt
+public:
+	Player(float switchFrame, float frameSpeed, std::string textureName, int id, string name);
+	~Player();
 };
-#endif //PLAYER_H

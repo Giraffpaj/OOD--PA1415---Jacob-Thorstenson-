@@ -1,9 +1,10 @@
+#pragma once
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 #include "IList.h"
 
 template <typename T>
-class ArrayList : IList<T>
+class ArrayList : public IList<T>
 {
 private:
 	T*data;
@@ -14,16 +15,17 @@ private:
 	void deepCopy(const ArrayList & other);
 public:
 	ArrayList(int cap);
-	~ArrayList();
-	void add(T data);
-	void remove(T data);
+	virtual ~ArrayList();
+	virtual void add(T data);
+	virtual void remove(T &data);
 	bool find(T data) const;
 	T getData(int pos)const;
-	int getSize() const;
+	virtual int getSize() const;
 	void clearAll();
 
 };
 #endif //ARRAYLIST
+
 
 template<typename T>
 inline void ArrayList<T>::expand()
@@ -32,7 +34,7 @@ inline void ArrayList<T>::expand()
 	T * temp = new T[this->cap];
 	for (int a = 0; a < this->nrOfData; a++)
 	{
-		temp[a] = this->data[a]
+		temp[a] = this->data[a];
 	}
 	delete[] this->data;
 	this->data = temp;
@@ -79,7 +81,7 @@ inline void ArrayList<T>::add(T data)
 }
 
 template<typename T>
-inline void ArrayList<T>::remove(T data)
+inline void ArrayList<T>::remove(T &data)
 {
 	for (int a = 0; a < this->nrOfData; a++) {
 		if (this->data[a] == data)

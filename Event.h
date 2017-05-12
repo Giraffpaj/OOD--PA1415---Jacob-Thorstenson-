@@ -13,6 +13,7 @@ public:
 	Event(std::string*dataTxt = nullptr, int*dataNum = nullptr, std::string*handler = nullptr, std::string*action = nullptr);
 	Event(const Event& other);
 	Event& operator=(const Event&other);
+	bool operator==(const Event&other);
 	~Event();
 	std::string getToString()const;
 	int getDataNum()const;

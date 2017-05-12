@@ -1,6 +1,9 @@
+#pragma once
 #ifndef OBJECT_H
 #define OBJECT_H
-#include "GameLogic.h"
+#include <SFML\Graphics.hpp>
+#include <SFML\System.hpp>
+using namespace std;
 
 class Object
 {
@@ -11,16 +14,15 @@ private:
 	int ID;
 	string name;
 public:
-	Object(string textureName, int id, string name);
+	Object(string textureName = "noImage", int id = -1, string name = "noName");
 	~Object() {};
+	bool operator==(const Object&other);
 	int getID()const;
 	string getName()const;
 	sf::Sprite getSprite()const;
 	void setSprite(sf::Sprite mySprite);
 	sf::RectangleShape getRectangleShape()const;
 	void setRectangleShape(sf::RectangleShape myRectangleShape);
-	void draw(sf::RenderWindow myRenderWindow);
+	void draw(sf::RenderWindow &myRenderWindow);
 };
 #endif // !OBJECT_H
-
-#include "GameLogic.h"

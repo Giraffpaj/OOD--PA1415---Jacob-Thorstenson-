@@ -1,48 +1,39 @@
 #include "ButtonListener.h"
 
-void ButtonListener::checkPressedButtons()
+Event ButtonListener::checkPressedButtons()
 {
+	Event myEvent;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		Event myEvent = createEvent("W", "MovementHandler", "moveUp");
-		this->myGameLogic->addEvent(myEvent);
+		myEvent = createEvent("W", "MovementHandler", "moveUp");
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		Event myEvent = createEvent("D", "MovementHandler", "moveRight");
-		this->myGameLogic->addEvent(myEvent);
+		myEvent = createEvent("D", "MovementHandler", "moveRight");
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		Event myEvent = createEvent("S", "MovementHandler", "moveDown");
-		this->myGameLogic->addEvent(myEvent);
+		myEvent = createEvent("S", "MovementHandler", "moveDown");
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		Event myEvent = createEvent("A", "MovementHandler", "moveLeft");
-		this->myGameLogic->addEvent(myEvent);
+		myEvent = createEvent("A", "MovementHandler", "moveLeft");
 	}
+	return myEvent;
 }
 
 void ButtonListener::clearAll()
 {
-	if (this->myGameLogic != nullptr)
-	{
-		delete this->myGameLogic;
-	}
+
 }
 
 void ButtonListener::deepCopy(const ButtonListener & other)
 {
-	if (other.myGameLogic != nullptr)
-	{
-		this->myGameLogic = new GameLogic(other.myGameLogic);
-	}
+
 }
 
-ButtonListener::ButtonListener(GameLogic*myGameLogic)
+ButtonListener::ButtonListener()
 {
-	this->myGameLogic = myGameLogic;
 }
 
 ButtonListener::ButtonListener(const ButtonListener & other)
@@ -67,17 +58,14 @@ void ButtonListener::tick()
 
 Event ButtonListener::createEvent(string button, string handler, string action)
 {
-	string*button = new string(button);
-	string*handler = new string(handler);
-	string*action = new string(action);
-
-	
+	string*myButton = new string(button);
+	string*myHandler = new string(handler);
+	string*myAction = new string(action);
+	Event myEvent(myButton, nullptr, myHandler, myAction);
+	return myEvent;
 }
 
 ButtonListener::~ButtonListener()
 {
-	if (this->myGameLogic != nullptr)
-	{
-		delete this->myGameLogic;
-	}
+
 }

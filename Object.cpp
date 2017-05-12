@@ -2,7 +2,7 @@
 
 Object::Object(string textureName, int id, string name)
 {	//load Texture
-	if (!this->myTexture.loadFromFile(textureName+".png"))
+	if (textureName != "noImage" && !this->myTexture.loadFromFile(textureName+".png"))
 	{
 		EXIT_FAILURE;
 	}
@@ -16,6 +16,11 @@ Object::Object(string textureName, int id, string name)
 	//this->mySprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 0, 32, 32));
 	this->ID = id;
 	this->name = name;
+}
+
+bool Object::operator==(const Object & other)
+{
+	return this->ID == other.ID;
 }
 
 int Object::getID() const
@@ -48,7 +53,7 @@ void Object::setRectangleShape(sf::RectangleShape myRectangleShape)
 	this->myRectangleShape = myRectangleShape;
 }
 
-void Object::draw(sf::RenderWindow myRenderWindow)
+void Object::draw(sf::RenderWindow &myRenderWindow)
 {
 	myRenderWindow.draw(this->mySprite);
 }
