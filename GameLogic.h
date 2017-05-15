@@ -29,6 +29,7 @@ private:
 	//ButtonHandler;
 	//DrawHandler;
 	ButtonListener*myButtonListener;
+	void clearAll();
 public:
 	GameLogic();
 	~GameLogic();
