@@ -1,7 +1,7 @@
 #pragma once
 #ifndef GAMELOGIC_H
 #define GAMELOGIC_H
-#include "ButtonListener.h"  //kommentera ut denna och allt blir r‰tt
+#include "ButtonListener.h"  //kommentera ut denna och allt blir r√§tt
 #include "MovementHandler.h"
 #include <string>
 #include <SFML\Graphics.hpp>
@@ -31,7 +31,7 @@ private:
 	ButtonListener*myButtonListener;
 public:
 	GameLogic();
-	~GameLogic() { /*Empty for now*/ };
+	~GameLogic();
 	void addEvent(Event*myEvent);
 	void tick(sf::RenderWindow &myRenderWindow);
 };
