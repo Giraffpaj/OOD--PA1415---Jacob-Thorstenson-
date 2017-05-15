@@ -13,7 +13,7 @@ int main()
 	{
 		sf::Event event; //Skapar ett event
 
-		while (window.pollEvent(event)) //skapar ett event som gör att man kan kryssa ner fönstret
+		while (window.pollEvent(event)) //skapar ett event som gÃ¶r att man kan kryssa ner fÃ¶nstret
 		{
 			switch (event.type)
 			{
@@ -33,4 +33,7 @@ int main()
 		//window.draw(MH.getPlayerSprite()); 
 		window.display();
 	}
+	
+	delete g1;
+	return 0;
 }
