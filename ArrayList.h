@@ -1,38 +1,40 @@
+#pragma once
 #ifndef ARRAYLIST_H
 #define ARRAYLIST_H
 #include "IList.h"
 
 template <typename T>
-class ArrayList : IList<T>
+class ArrayList : public IList<T>
 {
 private:
-	T*data;
+	T**data;
 	int nrOfData;
 	int cap;
 	int increment; //variabel som ökar cap vid expand varje gång
 	void expand();
 	void deepCopy(const ArrayList & other);
+	void clearAll();
 public:
 	ArrayList(int cap);
-	~ArrayList();
-	void add(T data);
-	void remove(T data);
-	bool find(T data) const;
-	T getData(int pos)const;
-	int getSize() const;
-	void clearAll();
+	virtual ~ArrayList();
+	virtual void add(T*data);
+	virtual void remove(T*data);
+	bool find(T*data) const;
+	T* getData(int pos)const;
+	virtual int getSize() const;
 
 };
 #endif //ARRAYLIST
+
 
 template<typename T>
 inline void ArrayList<T>::expand()
 {
 	this->cap += this->increment;
-	T * temp = new T[this->cap];
+	T ** temp = new T*[this->cap];
 	for (int a = 0; a < this->nrOfData; a++)
 	{
-		temp[a] = this->data[a]
+		temp[a] = this->data[a];
 	}
 	delete[] this->data;
 	this->data = temp;
@@ -58,18 +60,18 @@ template<typename T>
 inline ArrayList<T>::ArrayList(int cap)
 {
 	this->cap = this->increment = cap;
-	this->data = new T[this->cap];
+	this->data = new T*[this->cap];
 	this->nrOfData = 0;
 }
 
 template<typename T>
 inline ArrayList<T>::~ArrayList()
 {
-	delete[] this->data;
+	this->clearAll();
 }
 
 template<typename T>
-inline void ArrayList<T>::add(T data)
+inline void ArrayList<T>::add(T* data)
 {
 	if (this->nrOfData == this->cap)
 	{
@@ -79,25 +81,37 @@ inline void ArrayList<T>::add(T data)
 }
 
 template<typename T>
-inline void ArrayList<T>::remove(T data)
+inline void ArrayList<T>::remove(T*data)
 {
-	for (int a = 0; a < this->nrOfData; a++) {
-		if (this->data[a] == data)
+	if (this->nrOfData != 0)
+	{
+		if (this->nrOfData == 1)
 		{
-			this->data[a] = this->data[this->nrOfData];
-			a = this->nrOfData;
-			this->nrOfData--;
+			delete this->data[0];
 		}
+		else
+		{
+			for (int a = 0; a < this->nrOfData; a++)
+			{
+				if ((*this->data[a]) == (*data))
+				{
+					this->data[a] = this->data[this->nrOfData];
+					delete this->data[this->nrOfData];
+					a = this->nrOfData;
+				}
+			}
+		}
+		this->nrOfData--;
 	}
 }
 
 template<typename T>
-inline bool ArrayList<T>::find(T data) const
+inline bool ArrayList<T>::find(T*data) const
 {
 	bool find = false;
 	for (int a = 0; a < this->nrOfData; a++)
 	{
-		if (this->data[a] == data)
+		if ((*this->data[a]) == data)
 		{
 			this->find = true;
 			a = this->nrOfData;
@@ -107,7 +121,7 @@ inline bool ArrayList<T>::find(T data) const
 }
 
 template<typename T>
-inline T ArrayList<T>::getData(int pos) const
+inline T* ArrayList<T>::getData(int pos) const
 {
 	return this->data[pos];
 }
@@ -121,8 +135,11 @@ inline int ArrayList<T>::getSize() const
 template<typename T>
 inline void ArrayList<T>::clearAll()
 {
+	for (int a = 0; a < this->nrOfData; a++)
+	{
+		delete this->data[a];
+	}
 	this->nrOfData = 0;
 	delete[] this->data;
 	this->cap = this->increment;
-	this->data = new T[this->cap];
 }
