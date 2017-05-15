@@ -15,13 +15,14 @@ private:
 	void deepCopy(const ArrayList & other);
 	void clearAll();
 public:
-	ArrayList(int cap);
+	ArrayList(int cap = 10);
 	virtual ~ArrayList();
 	virtual void add(T*data);
 	virtual void remove(T*data);
 	bool find(T*data) const;
 	T* getData(int pos)const;
 	virtual int getSize() const;
+	T* getByID(int ID)const;
 
 };
 #endif //ARRAYLIST
@@ -95,8 +96,8 @@ inline void ArrayList<T>::remove(T*data)
 			{
 				if ((*this->data[a]) == (*data))
 				{
-					this->data[a] = this->data[this->nrOfData];
-					delete this->data[this->nrOfData];
+					this->data[a] = this->data[this->nrOfData-1];
+					delete this->data[this->nrOfData-1];
 					a = this->nrOfData;
 				}
 			}
@@ -130,6 +131,29 @@ template<typename T>
 inline int ArrayList<T>::getSize() const
 {
 	return this->nrOfData;
+}
+
+template<typename T>
+inline T * ArrayList<T>::getByID(int ID) const
+{
+	T* toReturn = new T;
+	int IDnr;
+	bool found = false;
+
+	for (int i = 0; i < this->nrOfData&&found == false; i++)
+	{
+		if (dynamic_cast<Object*>(this->data[i]) != nullptr)
+		{
+			IDnr = dynamic_cast<Object*>(this->data[i])->getID();
+			if (ID == IDnr)
+			{
+				toReturn = this->data[i];
+				found = true;
+			}
+		}
+
+	}
+	return toReturn;
 }
 
 template<typename T>
