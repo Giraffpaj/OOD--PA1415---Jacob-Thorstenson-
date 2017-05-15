@@ -32,6 +32,11 @@ GameLogic::GameLogic()
 	//slut på Ful-lösning
 }
 
+GameLogic::~GameLogic()
+{
+	this->clearAll();
+}
+
 void GameLogic::addEvent(Event*myEvent)
 {
 	this->myEvents->add(myEvent);
