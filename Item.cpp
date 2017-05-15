@@ -1,6 +1,6 @@
 #include "Item.h"
 
-Item::Item(int itemID, string name, string itemType, string description, string myTexture)
+Item::Item(string itemType, string description, string myTexture, int itemID, string name)
 	: Object(myTexture,itemID, name)
 {
 	this->itemType = itemType;

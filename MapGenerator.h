@@ -3,10 +3,14 @@
 #include <iostream>
 #include <SFML\System.hpp>
 #include <ctime>
+#include "DrawHandler.h"
+#include "Library.h"
 
 class MapGenerator
 {
 private:
+	DrawHandler*myDrawHandler;
+	Library*myLibrary;
 	int xSize;
 	int ySize;
 	int**map;
@@ -21,7 +25,7 @@ private:
 	void deepCopy(const MapGenerator & other);
 	void clearAll();
 public:
-	MapGenerator(int xSize, int ySize);
+	MapGenerator(int xSize, int ySize, DrawHandler*myDrawHandler, Library*myLibrary);
 	~MapGenerator();
 	MapGenerator(const MapGenerator & other);
 	MapGenerator& operator=(const MapGenerator & other);
@@ -32,6 +36,7 @@ public:
 	int getRight(int dir);
 	int getTail(int dir);
 	void drawMap();
+	void createExitTile(); 
 };
 
 #endif //MAPGENERATOR_H

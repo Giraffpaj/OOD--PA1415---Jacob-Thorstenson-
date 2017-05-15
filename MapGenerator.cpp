@@ -45,8 +45,10 @@ void MapGenerator::clearAll()
 	delete[]this->crossPoints;
 }
 
-MapGenerator::MapGenerator(int xSize, int ySize)
+MapGenerator::MapGenerator(int xSize, int ySize, DrawHandler*myDrawHandler, Library*myLibrary)
 {
+	this->myDrawHandler = myDrawHandler;
+	this->myLibrary = myLibrary;
 	this->nrOfMapTiles = 0;
 	this->corridorSize = 0;
 	this->currentCrosspoint = 0;
@@ -172,12 +174,6 @@ sf::Vector2i * MapGenerator::createCorridor(int dirPriority[], sf::Vector2i star
 			//expand possibility
 			randNum = rand() % 170;
 			if (randNum > 150)
-			{
-				
-				start = makeStep(this->getRight(dirPriority[0]), start);
-				corridor[nrOfSteps++] = start;
-			}
-			if (randNum > 110)
 			{
 				randNum = rand() % 2;
 				if (randNum == 1)
@@ -347,21 +343,48 @@ int MapGenerator::getTail(int dir)
 	return tail;
 }
 
+
+
 void MapGenerator::drawMap()
 {
+	Object*tile;
 	for (int a = 0; a < this->ySize; a++)
 	{
 		for (int b = 0; b < this->xSize; b++)
 		{
 			if (map[a][b] == 1)
 			{
-				std::cout << "[]";
+				map[a][b] = 20;
+				tile = new Object(*this->myLibrary->getObject(20));
+				tile->moveRectangleShape(b * 32, a * 32);
+				this->myDrawHandler->addObject(tile);
 			}
+			else if(map[a][b] == 2)
+			{
+				tile = new Object(*this->myLibrary->getObject(30)); 
+				tile->moveRectangleShape(b * 32, a * 32); 
+				this->myDrawHandler->addObject(tile); 
+			}
+
 			else
 			{
-				std::cout << "##";
+				map[a][b] = 10;
+				tile = new Object(*this->myLibrary->getObject(10));
+				tile->moveRectangleShape(b * 32, a * 32);
+				this->myDrawHandler->addObject(tile);
 			}
 		}
-		std::cout << std::endl;
 	}
+		int randPlayerPos = rand() % this->nrOfPoints;
+		Player*thePlayer = static_cast<Player*>(this->myLibrary->getObject(1));
+		thePlayer->setMapPos(this->crossPoints[randPlayerPos].x, this->crossPoints[randPlayerPos].y);
+		thePlayer->moveRectangleShape(this->crossPoints[randPlayerPos].x*32, this->crossPoints[randPlayerPos].y*32);
+		this->myLibrary->setLayer("design", this->map);
+}
+
+void MapGenerator::createExitTile()
+{
+	int randNr = rand() % this->nrOfPoints;
+	sf::Vector2i exitPoint = this->crossPoints[randNr];
+	this->map[exitPoint.y][exitPoint.x] = 2;
 }

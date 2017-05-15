@@ -13,15 +13,16 @@ private:
 	int increment; //variabel som ökar cap vid expand varje gång
 	void expand();
 	void deepCopy(const ArrayList & other);
-	void clearAll();
 public:
-	ArrayList(int cap);
+	ArrayList(int cap=10);
 	virtual ~ArrayList();
 	virtual void add(T*data);
 	virtual void remove(T*data);
 	bool find(T*data) const;
 	T* getData(int pos)const;
 	virtual int getSize() const;
+	void clearAll();
+	T* getByID(int ID)const;
 
 };
 #endif //ARRAYLIST
@@ -71,7 +72,7 @@ inline ArrayList<T>::~ArrayList()
 }
 
 template<typename T>
-inline void ArrayList<T>::add(T* data)
+inline void ArrayList<T>::add(T*data)
 {
 	if (this->nrOfData == this->cap)
 	{
@@ -83,26 +84,20 @@ inline void ArrayList<T>::add(T* data)
 template<typename T>
 inline void ArrayList<T>::remove(T*data)
 {
-	if (this->nrOfData != 0)
-	{
-		if (this->nrOfData == 1)
-		{
-			delete this->data[0];
-		}
-		else
-		{
-			for (int a = 0; a < this->nrOfData; a++)
-			{
-				if ((*this->data[a]) == (*data))
-				{
-					this->data[a] = this->data[this->nrOfData];
-					delete this->data[this->nrOfData];
-					a = this->nrOfData;
-				}
-			}
-		}
-		this->nrOfData--;
-	}
+	this->nrOfData--; //felet ligger i arraylisten
+
+	//både dess delete funktion och dess comparing testar objekt ibland som är nullptr, som inte får vara där!!!!
+
+
+	//for (int a = 0; a < this->nrOfData; a++) {
+	//	if ((*this->data[a]) == (*data))
+	//	{
+	//		this->data[a] = this->data[this->nrOfData];
+	//		//delete this->data[this->nrOfData];
+	//		a = this->nrOfData;
+	//		this->nrOfData--;
+	//	}
+	//}
 }
 
 template<typename T>
@@ -135,11 +130,34 @@ inline int ArrayList<T>::getSize() const
 template<typename T>
 inline void ArrayList<T>::clearAll()
 {
+	this->nrOfData = 0;
 	for (int a = 0; a < this->nrOfData; a++)
 	{
 		delete this->data[a];
 	}
-	this->nrOfData = 0;
 	delete[] this->data;
 	this->cap = this->increment;
+}
+
+template<typename T>
+T* ArrayList<T>::getByID(int ID)const
+{
+	T* toReturn=new T;
+	int IDnr;
+	bool found = false;
+
+	for (int i = 0; i < this->nrOfData&&found==false; i++)
+	{
+		if (dynamic_cast<Object*>(this->data[i]) != nullptr)
+		{
+			IDnr = dynamic_cast<Object*>(this->data[i])->getID();
+			if (ID == IDnr)
+			{
+				toReturn = this->data[i];
+				found = true;
+			}
+		}
+
+	}
+	return toReturn;
 }

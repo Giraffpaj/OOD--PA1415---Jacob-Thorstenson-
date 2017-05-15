@@ -1,265 +1,108 @@
 #include "MovementHandler.h"
 
-MovementHandler::MovementHandler(int _startingPositionX, int _startingPositionY)
+MovementHandler::MovementHandler(Library*myLibrary)
 {
-}
-
-MovementHandler::MovementHandler(GameLogic*myGameLogic)
-{
+	this->myLibrary = myLibrary;
 	this->myMoveEvents = new ArrayList<Event>(20);
-	this->myGameLogic = myGameLogic;
-	//load Texture
-	if (!this->playerTexture.loadFromFile("spritesheet.png"))
-	{
-		EXIT_FAILURE; 
-	}
-	//set sprite
-	this->playerSprite.setTexture(this->playerTexture); 
-	
-	//set hitbox to same size as sprite
-	this->playerRect.setSize(sf::Vector2f(32, 32)); 
-
-
-	this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 0, 32, 32));
+	this->canMove = true; 
 
 	
 
 }
 
-void MovementHandler::addEvent(Event myEvent)
+void MovementHandler::addEvent(Event*myEvent)
 {
 	this->myMoveEvents->add(myEvent);
 }
 
 void MovementHandler::tick()
 {
-	Event currentEvent;
-	for (int a = 0; a < this->myMoveEvents->getSize; a++)
+	int k = 32;
+	Event*currentEvent;
+	Object*player = this->myLibrary->getObject(1);
+	Player*thePlayer = static_cast<Player*>(player);
+	sf::Vector2i pos = thePlayer->getMapPos();
+	if (thePlayer == nullptr)
+	{
+		//det funka inte
+	}
+	for (int a = 0; a < this->myMoveEvents->getSize(); a++)
 	{
 		currentEvent = this->myMoveEvents->getData(a);
-		if (currentEvent.getAction == "moveUp")
+		if (currentEvent->getAction() == "moveUp" && this->playerClock.getElapsedTime().asMilliseconds() > 200)
 		{
-			//Player går uppåt
+			if (this->myLibrary->getMapID("design", pos.x, pos.y - 1) != 10)
+			{
+				thePlayer->updateSpriteSheet(this->counterWalking, 3, 0, -1*k);
+				thePlayer->setMapPos(pos.x, pos.y - 1);
+				this->playerClock.restart(); 
+			
+			}
+			//Player går Upp
 		}
-		if (currentEvent.getAction == "moveRight")
+		if (currentEvent->getAction() == "moveRight"&& this->playerClock.getElapsedTime().asMilliseconds() > 200)
 		{
+			if (this->myLibrary->getMapID("design", pos.x+1, pos.y) != 10)
+			{
+				thePlayer->updateSpriteSheet(this->counterWalking, 2, 1*k, 0);
+				thePlayer->setMapPos(pos.x+1, pos.y);
+				this->playerClock.restart();
+
+			}
 			//Player går Höger
 		}
-		if (currentEvent.getAction == "moveDown")
+		if (currentEvent->getAction() == "moveDown"&& this->playerClock.getElapsedTime().asMilliseconds() > 200)
 		{
+			if (this->myLibrary->getMapID("design", pos.x, pos.y+1) != 10)
+			{
+				thePlayer->updateSpriteSheet(this->counterWalking, 0, 0, 1*k);
+				thePlayer->setMapPos(pos.x, pos.y+1);
+				this->playerClock.restart();
+			}
 			//Player går ner
 		}
-		if (currentEvent.getAction == "moveLeft")
+		if (currentEvent->getAction() == "moveLeft"&& this->playerClock.getElapsedTime().asMilliseconds() > 200)
 		{
+			if (this->myLibrary->getMapID("design", pos.x-1, pos.y) != 10)
+			{
+				thePlayer->updateSpriteSheet(this->counterWalking, 1, -1*k, 0);
+				thePlayer->setMapPos(pos.x-1, pos.y);
+				this->playerClock.restart();
+			}
 			//Player går vänster
 		}
+		this->counterWalking++;
+		if (this->counterWalking == 2)
+		{
+			this->counterWalking = 0;
+		}
 		this->myMoveEvents->remove(currentEvent);
-		currentEvent.clearAll();
 	}
-}
-
-void MovementHandler::update()
-{
-	//sprite follows hitbox
-	playerSprite.setPosition(this->playerRect.getPosition()); 
-}
-
-void MovementHandler::updateMovement()
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	pos = thePlayer->getMapPos();
+	if (this->myLibrary->getMapID("design", pos.x, pos.y) == 2)
 	{
-		if (this->canMoveUp == true)
-		{
-			this->playerRect.move(0, -1); 
-			this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 32* 3, 32, 32)); 
-			this->direction = 1; 
 
-			this->canMoveUp = true;
-			this->canMoveDown = true;
-			this->canMoveLeft = true;
-			this->canMoveRight = true;
-		}
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-	{
-		if (this->canMoveDown == true)
-		{
-			this->playerRect.move(0, 1);
-			this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 0, 32, 32));
-			this->direction = 2;
-
-			this->canMoveUp = true;
-			this->canMoveDown = true;
-			this->canMoveLeft = true;
-			this->canMoveRight = true;
-		}
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	{
-		if (this->canMoveLeft == true)
-		{
-			this->playerRect.move(-1, 0);
-			this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 32 * 1, 32, 32));
-			this->direction = 3;
-
-			this->canMoveUp = true;
-			this->canMoveDown = true;
-			this->canMoveLeft = true;
-			this->canMoveRight = true;
-		}
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{
-		if (this->canMoveRight == true)
-		{
-			this->playerRect.move(1,0);
-			this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 32 * 2, 32, 32));
-			this->direction = 4;
-
-			this->canMoveUp = true;
-			this->canMoveDown = true;
-			this->canMoveLeft = true;
-			this->canMoveRight = true;
-		}
-	}
-	
-	this->frameCounter += this->frameSpeed* this->clock.restart().asSeconds(); 
-	if (this->frameCounter >= this->switchFrame)
-	{
-		this->frameCounter = 0; 
-		//updates sprite sheet
-		this->counterWalking++;
-		//resets sprite sheet
-		if (this->counterWalking == 2)
-		{
-			this->counterWalking = 0;
-		}
-	}
-	
-
-
-	
-}
-
-void MovementHandler::updateMovement2()
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->movementLength == 0)
-	{
-		if (this->canMoveUp == true)
-		{
-			while (this->movementLength != 32)
-			{
-				this->playerRect.move(0, -1);
-				this->movementLength++;
-				this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 32 * 3, 32, 32));
-			}
-			this->direction = 1;
-
-			this->canMoveUp = true;
-			this->canMoveDown = true;
-			this->canMoveLeft = true;
-			this->canMoveRight = true;
-		}
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->movementLength == 0)
-	{
-		if (this->canMoveDown == true)
-		{
-			while (this->movementLength != 32)
-			{
-				this->playerRect.move(0, 1);
-				this->movementLength++;
-				this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 0, 32, 32));
-			}
-			this->direction = 2;
-
-			this->canMoveUp = true;
-			this->canMoveDown = true;
-			this->canMoveLeft = true;
-			this->canMoveRight = true;
-		}
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && this->movementLength == 0)
-	{
-		if (this->canMoveLeft == true)
-		{
-			while (this->movementLength != 32)
-			{
-				this->playerRect.move(-1, 0);
-				this->movementLength++;
-				this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 32 * 1, 32, 32));
-			}
-			this->direction = 3;
-
-			this->canMoveUp = true;
-			this->canMoveDown = true;
-			this->canMoveLeft = true;
-			this->canMoveRight = true;
-		}
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && this->movementLength == 0)
-	{
-		if (this->canMoveRight == true)
-		{
-			while (this->movementLength != 32)
-			{
-				this->playerRect.move(1, 0);
-				this->movementLength++;
-				this->playerSprite.setTextureRect(sf::IntRect(this->counterWalking * 32, 32 * 2, 32, 32));
-			}
-			this->direction = 4;
-
-			this->canMoveUp = true;
-			this->canMoveDown = true;
-			this->canMoveLeft = true;
-			this->canMoveRight = true;
-		}
-	}
-
-	this->frameCounter += this->frameSpeed* this->clock.restart().asSeconds();
-	if (this->frameCounter >= this->switchFrame)
-	{
-		this->frameCounter = 0;
-		//updates sprite sheet
-		this->counterWalking++;
-		//resets sprite sheet
-		if (this->counterWalking == 2)
-		{
-			this->counterWalking = 0;
-		}
-		//reset movementLength
-		if (this->movementLength == 32)
-		{
-			this->movementLength = 0; 
-		}
-	}
-}
-
-void MovementHandler::combat()
-{
-	if (direction == 1 && sf::Keyboard().isKeyPressed(sf::Keyboard::Space))
-	{
-		this->playerSprite.setTextureRect(sf::IntRect(0, 7 * 32, 32, 32));
-	}
-	if (direction == 2 && sf::Keyboard().isKeyPressed(sf::Keyboard::Space))
-	{
-		this->playerSprite.setTextureRect(sf::IntRect(0, 4 * 32, 32, 32));
-	}
-	if (direction == 3 && sf::Keyboard().isKeyPressed(sf::Keyboard::Space))
-	{
-		this->playerSprite.setTextureRect(sf::IntRect(0, 5 * 32, 32, 32));
-	}
-	if (direction == 4 && sf::Keyboard().isKeyPressed(sf::Keyboard::Space))
-	{
-		this->playerSprite.setTextureRect(sf::IntRect(0, 6 * 32, 32, 32));
 	}
 
 }
 
-
-
-
-sf::Sprite MovementHandler::getPlayerSprite() const
-{
-	return this->playerSprite;
-}
+//void MovementHandler::combat()
+//{
+//	if (direction == 1 && sf::Keyboard().isKeyPressed(sf::Keyboard::Space))
+//	{
+//		this->playerSprite.setTextureRect(sf::IntRect(0, 7 * 32, 32, 32));
+//	}
+//	if (direction == 2 && sf::Keyboard().isKeyPressed(sf::Keyboard::Space))
+//	{
+//		this->playerSprite.setTextureRect(sf::IntRect(0, 4 * 32, 32, 32));
+//	}
+//	if (direction == 3 && sf::Keyboard().isKeyPressed(sf::Keyboard::Space))
+//	{
+//		this->playerSprite.setTextureRect(sf::IntRect(0, 5 * 32, 32, 32));
+//	}
+//	if (direction == 4 && sf::Keyboard().isKeyPressed(sf::Keyboard::Space))
+//	{
+//		this->playerSprite.setTextureRect(sf::IntRect(0, 6 * 32, 32, 32));
+//	}
+//
+//}

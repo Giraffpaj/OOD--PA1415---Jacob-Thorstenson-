@@ -1,48 +1,43 @@
 #include "ButtonListener.h"
 
-void ButtonListener::checkPressedButtons()
+Event* ButtonListener::checkPressedButtons()
 {
+	Event*myEvent = nullptr;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		Event myEvent = createEvent("W", "MovementHandler", "moveUp");
-		this->myGameLogic->addEvent(myEvent);
+		myEvent =  new Event("W", -1, "MovementHandler", "moveUp");
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		Event myEvent = createEvent("D", "MovementHandler", "moveRight");
-		this->myGameLogic->addEvent(myEvent);
+		myEvent = new Event("D", -1, "MovementHandler", "moveRight");
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		Event myEvent = createEvent("S", "MovementHandler", "moveDown");
-		this->myGameLogic->addEvent(myEvent);
+		myEvent = new Event("S", -1, "MovementHandler", "moveDown");
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		Event myEvent = createEvent("A", "MovementHandler", "moveLeft");
-		this->myGameLogic->addEvent(myEvent);
+		myEvent = new Event("A", -1, "MovementHandler", "moveLeft");
 	}
+	if (myEvent == nullptr)
+	{
+		myEvent = new Event();
+	}
+	return myEvent;
 }
 
 void ButtonListener::clearAll()
 {
-	if (this->myGameLogic != nullptr)
-	{
-		delete this->myGameLogic;
-	}
+
 }
 
 void ButtonListener::deepCopy(const ButtonListener & other)
 {
-	if (other.myGameLogic != nullptr)
-	{
-		this->myGameLogic = new GameLogic(other.myGameLogic);
-	}
+
 }
 
-ButtonListener::ButtonListener(GameLogic*myGameLogic)
+ButtonListener::ButtonListener()
 {
-	this->myGameLogic = myGameLogic;
 }
 
 ButtonListener::ButtonListener(const ButtonListener & other)
@@ -65,19 +60,7 @@ void ButtonListener::tick()
 	this->checkPressedButtons();
 }
 
-Event ButtonListener::createEvent(string button, string handler, string action)
-{
-	string*button = new string(button);
-	string*handler = new string(handler);
-	string*action = new string(action);
-
-	
-}
-
 ButtonListener::~ButtonListener()
 {
-	if (this->myGameLogic != nullptr)
-	{
-		delete this->myGameLogic;
-	}
+	delete this->checkPressedButtons(); 
 }

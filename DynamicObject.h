@@ -1,18 +1,26 @@
+#pragma once
 #ifndef DYNAMICOBJECT_H
 #define DYNAMICOBJECT_H
-#include "GameLogic.h"
 #include "Object.h"
-class DynamicObject : Object
+using namespace std;
+class DynamicObject : public Object
 {
 private:
-	int myUpdateSpriteCounter,
-		myDirection;
-	float myFrameCounter,
-		mySwitchFrame,
-		myFrameSpeed;
+	int myUpdateSpriteCounter;
+	float myFrameCounter;
+	float mySwitchFrame;
+	float myFrameSpeed;
+	sf::Clock myClock; 
 public:
+	DynamicObject();
 	DynamicObject(float switchFrame, float frameSpeed, std::string textureName, int id, string name);
-	void update();
+	bool operator==(const DynamicObject & other);
+	void updateSpriteSheet(int counterX, int counterY, int dirX, int dirY);
+	float getFrameCounter() const; 
+	float getFrameSpeed() const; 
+	float getSwitchFrame() const; 
+	void setFrameCounter(float frameCounter); 
+
 };
 
 #endif //DYAMICOBJECT_H
