@@ -26,7 +26,7 @@ Library::Library()
 
 Library::~Library()
 {
-
+	delete this->myMap;
 }
 
 Object* Library::getObject(int id) const
@@ -52,7 +52,7 @@ void Library::setMapID(string layer, int x, int y, int ID)
 //std::string Library::find(int id) const
 //{
 //	string category = "noCategoryFound";
-//	//funktionen under bör ligga  i en forloop, men nu har vvi bara en spelare så den ligger löst
+//	//funktionen under bÃ¶r ligga  i en forloop, men nu har vvi bara en spelare sÃ¥ den ligger lÃ¶st
 //	this->objects.find(Object.id)
 //	if (this->players[0]->getID() == id)
 //	{
