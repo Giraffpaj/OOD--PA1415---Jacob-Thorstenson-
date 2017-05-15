@@ -10,6 +10,11 @@ MovementHandler::MovementHandler(Library*myLibrary)
 
 }
 
+MovementHandler::~MovementHandler()
+{
+	delete this->myMoveEvents;
+}
+
 void MovementHandler::addEvent(Event*myEvent)
 {
 	this->myMoveEvents->add(myEvent);
@@ -38,7 +43,7 @@ void MovementHandler::tick()
 				this->playerClock.restart(); 
 			
 			}
-			//Player går Upp
+			//Player gÃ¥r Upp
 		}
 		if (currentEvent->getAction() == "moveRight"&& this->playerClock.getElapsedTime().asMilliseconds() > 200)
 		{
@@ -49,7 +54,7 @@ void MovementHandler::tick()
 				this->playerClock.restart();
 
 			}
-			//Player går Höger
+			//Player gÃ¥r HÃ¶ger
 		}
 		if (currentEvent->getAction() == "moveDown"&& this->playerClock.getElapsedTime().asMilliseconds() > 200)
 		{
@@ -59,7 +64,7 @@ void MovementHandler::tick()
 				thePlayer->setMapPos(pos.x, pos.y+1);
 				this->playerClock.restart();
 			}
-			//Player går ner
+			//Player gÃ¥r ner
 		}
 		if (currentEvent->getAction() == "moveLeft"&& this->playerClock.getElapsedTime().asMilliseconds() > 200)
 		{
@@ -69,7 +74,7 @@ void MovementHandler::tick()
 				thePlayer->setMapPos(pos.x-1, pos.y);
 				this->playerClock.restart();
 			}
-			//Player går vänster
+			//Player gÃ¥r vÃ¤nster
 		}
 		this->counterWalking++;
 		if (this->counterWalking == 2)
